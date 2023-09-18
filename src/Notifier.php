@@ -4,6 +4,7 @@
  */
 
 namespace tuyakhov\notifications;
+use tuyakhov\notifications\NotificationException;
 use tuyakhov\notifications\channels\ChannelInterface;
 use tuyakhov\notifications\events\NotificationEvent;
 use yii\base\Component;
@@ -60,10 +61,19 @@ class Notifier extends Component
      */
     public $channels = [];
 
+
+    /*
+     * Error handling stategies
+     */
+    const ON_ERROR_FAIL = 0;
+	const ON_ERROR_IGNORE = 1;
+	const ON_ERROR_RETURN = 2;
+	const ON_ERROR_THROW = 3;
+
     /**
      * Sends the given notifications through available channels to the given notifiable entities.
      * You may pass an array in order to send multiple notifications to multiple recipients.
-     * 
+     *
      * @param array|NotifiableInterface $recipients the recipients that can receive given notifications.
      * @param array|NotificationInterface $notifications the notification that should be delivered.
      * @return void
@@ -77,14 +87,14 @@ class Notifier extends Component
              */
             $recipients = [$recipients];
         }
-        
+
         if (!is_array($notifications)){
             /**
              * @var $notifications NotificationInterface[]
              */
             $notifications = [$notifications];
         }
-        
+
         foreach ($recipients as $recipient) {
             $channels = array_intersect($recipient->viaChannels(), array_keys($this->channels));
             foreach ($notifications as $notification) {
@@ -95,11 +105,18 @@ class Notifier extends Component
                 $channels = array_intersect($channels, $notification->broadcastOn());
                 foreach ($channels as $channel) {
                     $channelInstance = $this->getChannelInstance($channel);
-                    try {
-                        \Yii::info("Sending notification " . get_class($notification) . " to " . get_class($recipient) . " via {$channel}", __METHOD__);
-                        $response = $channelInstance->send($recipient, $notification);
-                    } catch (\Exception $e) {
-                        $response = $e;
+					\Yii::info("Sending notification " . get_class($notification) . " to " . get_class($recipient) . " via {$channel}", __METHOD__);
+					$response = $channelInstance->send($recipient, $notification);
+					if ($notification->hasNotificationErrors()) {
+						$response = implode("\n",$notification->notificationErrors());
+                        if (YII_ENV_DEV) {
+							throw new NotificationException($response);
+						} else switch($notification->onError) {
+							case self::ON_ERROR_FAIL:
+							case self::ON_ERROR_THROW:
+								throw new NotificationException($response);
+						}
+                        \Yii::error("Error sending notification " . get_class($notification) . " to " . get_class($recipient) . " via {$channel}\n" . $response,  __METHOD__);
                     }
                     $this->trigger(self::EVENT_AFTER_SEND, new NotificationEvent([
                         'notification' => $notification,
