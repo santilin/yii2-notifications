@@ -42,7 +42,7 @@ class MailChannel extends Component implements ChannelInterface
          * @var $message MailMessage
          */
         $message = $notification->exportFor('mail');
-		$mesage_views = $message->view;
+		$message_views = $message->view;
 		// Let the message decide if it wants text email bodies
 		if (!is_array($message_views)) {
 			$message_views = [ 'html' => $message_views ];

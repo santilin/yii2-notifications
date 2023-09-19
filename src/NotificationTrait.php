@@ -84,7 +84,7 @@ trait NotificationTrait
      * @param string|null $channel channel name. Use null to check all channels.
      * @return bool whether there is any error.
      */
-	public function hasErrors(string $channel = null): bool
+	public function hasNotificationErrors(string $channel = null): bool
     {
         return $channel === null ? !empty($this->_notification_errors) : isset($this->_notification_errors[$channel]);
     }
