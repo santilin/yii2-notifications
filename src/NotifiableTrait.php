@@ -38,7 +38,7 @@ trait NotifiableTrait
      */
     public function viaChannels()
     {
-        return ['mail'];
+        return ['mail','flash'];
     }
 
     /**
