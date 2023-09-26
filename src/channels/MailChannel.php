@@ -94,7 +94,8 @@ class MailChannel extends Component implements ChannelInterface
 				if( YII_ENV_DEV ) {
 					$mail_message_parts = $composed->getSwiftMessage()->getChildren();
 					$html_mail = $mail_message_parts[0];
-					$notification->addError('mailbody', "View: $view_name\nSubject: $subject\n\n$mailer_error\n\n"
+					$notification->addError('mailbody',
+						"$mailer_error\n\nView: {$message_views['html']}\nSubject: $subject\nBody: "
 						. trim(strip_tags($html_mail->getBody())));
 				}
 			} else {

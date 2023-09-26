@@ -107,9 +107,7 @@ class Notifier extends Component
 					$response = $channelInstance->send($recipient, $notification);
 					if ($notification->hasNotificationErrors()) {
 						$response = implode("\n",$notification->notificationErrors());
-                        if (YII_ENV_DEV) {
-							throw new NotificationException($response);
-						} else switch($notification->onError) {
+						switch($notification->onError) {
 							case self::ON_ERROR_FAIL:
 							case self::ON_ERROR_THROW:
 								throw new NotificationException($response);
