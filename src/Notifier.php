@@ -111,6 +111,9 @@ class Notifier extends Component
 							case self::ON_ERROR_FAIL:
 							case self::ON_ERROR_THROW:
 								throw new NotificationException($response);
+							case self::ON_ERROR_IGNORE:
+								$notification->clearNotificationErrors();
+								break;
 						}
                         \Yii::error("Error sending notification " . get_class($notification) . " to " . get_class($recipient) . " via {$channel}\n" . $response,  __METHOD__);
                     }

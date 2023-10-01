@@ -60,8 +60,11 @@ class MailChannel extends Component implements ChannelInterface
 		$from = $message->from??'no-reply@'.Url::base(true);
 		$to = $recipient->routeNotificationFor('mail');
 		$data = $message->viewData;
-		$data['recipient'] = $recipient;
-		$data['from'] = $from;
+		$data['mailParams'] = [
+			'recipient' => $recipient,
+			'from' => $from,
+			'notification' => $notification,
+		];
 		if (!is_array($to) ) {
 			$to = [ $to ];
 		}
