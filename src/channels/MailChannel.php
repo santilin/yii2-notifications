@@ -22,10 +22,10 @@ class MailChannel extends Component implements ChannelInterface
     public $mailer = 'mailer';
 
     /**
-     * The message sender.
+     * The message sender accounts.
      * @var string
      */
-    public $from;
+    public $senderAccounts = [];
 
     /**
      * @inheritdoc
@@ -57,7 +57,6 @@ class MailChannel extends Component implements ChannelInterface
 				}
 			}
 		);
-		$from = $message->from??'no-reply@'.Url::base(true);
 		$to = $recipient->routeNotificationFor('mail');
 		$data = $message->viewData;
 		$data['mailParams'] = [
@@ -74,7 +73,7 @@ class MailChannel extends Component implements ChannelInterface
 		}
 		$composed = Yii::$app->mailer
 			->compose( $message_views, $data )
-			->setFrom($from)
+			->setFrom($message->from)
 			->setTo( YII_ENV_DEV ? Yii::$app->params['develEmail'] : $to )
 			->setSubject($subject);
 		try {
