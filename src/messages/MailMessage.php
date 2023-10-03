@@ -10,7 +10,7 @@ class MailMessage extends AbstractMessage
 {
     /**
      * The view to be used for rendering the message body.
-     * @var string|array|null $view 
+     * @var string|array|null $view
      */
     public $view;
 
@@ -25,4 +25,11 @@ class MailMessage extends AbstractMessage
      * @var string
      */
     public $from;
+
+    /**
+     * The message sender account.
+     * @var string
+     */
+    public $senderAccount;
+
 }

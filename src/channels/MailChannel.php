@@ -11,6 +11,7 @@ use tuyakhov\notifications\messages\MailMessage;
 use tuyakhov\notifications\NotifiableInterface;
 use tuyakhov\notifications\NotificationInterface;
 use yii\base\Component;
+use yii\base\InvalidConfigException;
 use yii\di\Instance;
 use yii\mail\MailerInterface;
 
@@ -57,6 +58,13 @@ class MailChannel extends Component implements ChannelInterface
 				}
 			}
 		);
+		$from = $message->from;
+		if (empty($from)) {
+			$from = $this->senderAccounts[$message->senderAccount]??null;
+		}
+		if (empty($from)) {
+            throw new InvalidConfigException('neither from nor senderAccount found in mail message');
+        }
 		$to = $recipient->routeNotificationFor('mail');
 		$data = $message->viewData;
 		$data['mailParams'] = [
