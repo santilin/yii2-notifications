@@ -107,6 +107,7 @@ class Notifier extends Component
 					$response = $channelInstance->send($recipient, $notification);
 					if ($notification->hasNotificationErrors()) {
 						$response = implode("\n",$notification->notificationErrors());
+                        \Yii::error("Error sending notification " . get_class($notification) . " to " . get_class($recipient) . " via {$channel}\n" . $response,  __METHOD__);
 						switch($notification->onError) {
 							case self::ON_ERROR_FAIL:
 							case self::ON_ERROR_THROW:
@@ -115,7 +116,6 @@ class Notifier extends Component
 								$notification->clearNotificationErrors();
 								break;
 						}
-                        \Yii::error("Error sending notification " . get_class($notification) . " to " . get_class($recipient) . " via {$channel}\n" . $response,  __METHOD__);
                     }
                     $this->trigger(self::EVENT_AFTER_SEND, new NotificationEvent([
                         'notification' => $notification,
