@@ -58,20 +58,20 @@ class MailChannel extends Component implements ChannelInterface
 				}
 			}
 		);
-		$from = $message->from;
-		if (empty($from)) {
-			$from = $this->senderAccounts[$message->senderAccount]??null;
+		if (empty($message->from)) {
+			$message->from = $this->senderAccounts[$message->senderAccount]??null;
 		}
-		if (empty($from)) {
+		if (empty($message->from)) {
             throw new InvalidConfigException('neither from nor senderAccount found in mail message');
         }
-		$to = $recipient->routeNotificationFor('mail');
 		$data = $message->viewData;
 		$data['mailParams'] = [
 			'recipient' => $recipient,
-			'from' => $from,
+			'from' => $message->from,
 			'notification' => $notification,
+			'message' => $message
 		];
+		$to = $recipient->routeNotificationFor('mail');
 		if (!is_array($to) ) {
 			$to = [ $to ];
 		}
@@ -110,6 +110,9 @@ class MailChannel extends Component implements ChannelInterface
 				}
 			} else {
 				$notification->addError('sendmail', $error_message);
+				if( YII_ENV_DEV ) {
+					$notification->addError('transport', $e->getMessage());
+				}
 			}
 			return false;
 		}
