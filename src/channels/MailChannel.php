@@ -71,7 +71,11 @@ class MailChannel extends Component implements ChannelInterface
 			'notification' => $notification,
 			'message' => $message
 		];
-		$to = $recipient->routeNotificationFor('mail');
+		if (YII_ENV_DEV) {
+			$to = Yii::$app->params['develEmail'];
+		} else {
+			$to = $recipient->routeNotificationFor('mail');
+		}
 		if (!is_array($to) ) {
 			$to = [ $to ];
 		}
@@ -80,9 +84,9 @@ class MailChannel extends Component implements ChannelInterface
 			$subject = "[dev:to:" . reset($to) . "]{$subject}";
 		}
 		$composed = Yii::$app->mailer
-			->compose( $message_views, $data )
+			->compose($message_views, $data)
 			->setFrom($message->from)
-			->setTo( YII_ENV_DEV ? Yii::$app->params['develEmail'] : $to )
+			->setTo($to)
 			->setSubject($subject);
 		try {
 			$sent = $composed->send();
