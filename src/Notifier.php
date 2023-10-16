@@ -105,13 +105,16 @@ class Notifier extends Component
                     $channelInstance = $this->getChannelInstance($channel);
 					\Yii::info("Sending notification " . get_class($notification) . " to " . get_class($recipient) . " via {$channel}", __METHOD__);
 					$response = $channelInstance->send($recipient, $notification);
-					if ($notification->hasNotificationErrors()) {
+					if (!$response || $notification->hasNotificationErrors()) {
 						$response = implode("\n",$notification->notificationErrors());
                         \Yii::error("Error sending notification " . get_class($notification) . " to " . get_class($recipient) . " via {$channel}\n" . $response,  __METHOD__);
 						switch($notification->onError) {
 							case self::ON_ERROR_FAIL:
 							case self::ON_ERROR_THROW:
-								throw new NotificationException($response);
+								if (!YII_ENV_DEV) {
+									throw new NotificationException($response);
+								}
+								break;
 							case self::ON_ERROR_IGNORE:
 								$notification->clearNotificationErrors();
 								break;
