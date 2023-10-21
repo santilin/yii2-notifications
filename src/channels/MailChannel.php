@@ -46,7 +46,7 @@ class MailChannel extends Component implements ChannelInterface
 		$message_views = $message->view;
 		// Let the message decide if it wants text email bodies
 		if (!is_array($message_views)) {
-			$message_views = [ 'html' => $message_views ];
+			$message_views = [ 'html' => $message_views, 'text' => $message_views ];
 		}
 		$sent = false;
 		$mailer_error = '';

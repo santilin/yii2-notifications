@@ -81,19 +81,11 @@ class Notifier extends Component
     public function send($recipients, $notifications)
     {
         if (!is_array($recipients)) {
-            /**
-             * @var $recipients NotifiableInterface[]
-             */
             $recipients = [$recipients];
         }
-
         if (!is_array($notifications)){
-            /**
-             * @var $notifications NotificationInterface[]
-             */
             $notifications = [$notifications];
         }
-
         foreach ($recipients as $recipient) {
             $channels = array_intersect($recipient->viaChannels(), array_keys($this->channels));
             foreach ($notifications as $notification) {
