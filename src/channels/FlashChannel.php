@@ -35,6 +35,10 @@ class FlashChannel extends Component implements ChannelInterface
          */
         $message = $notification->exportFor('flash');
         $this->session->addFlash($message->category, $message->message);
+        if ($message->view && !empty($message->viewData['controller'])) {
+            $view_content = $message->viewData['controller']->renderPartial($message->view, $message->viewData);
+            $this->session->addFlash($message->viewCategory, $view_content);
+        }
 		return true;
 	}
 
