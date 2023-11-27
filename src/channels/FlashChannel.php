@@ -6,6 +6,7 @@
  */
 namespace tuyakhov\notifications\channels;
 
+use yii;
 use tuyakhov\notifications\NotifiableInterface;
 use tuyakhov\notifications\NotificationInterface;
 use yii\base\Component;
@@ -35,9 +36,10 @@ class FlashChannel extends Component implements ChannelInterface
          */
         $message = $notification->exportFor('flash');
         $this->session->addFlash($message->category, $message->message);
-        if ($message->view && !empty($message->viewData['controller'])) {
-            $view_content = $message->viewData['controller']->renderPartial($message->view, $message->viewData);
-            $this->session->addFlash($message->viewCategory, $view_content);
+        if (property_exists($message,'view') && $message->view) {
+            $controller = $message->viewData['controller']??Yii::$app->controller;
+            $view_content = $controller->renderPartial($message->view, $message->viewData);
+            $this->session->addFlash($message->viewCategory??'info', $view_content);
         }
 		return true;
 	}
