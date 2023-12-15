@@ -68,6 +68,7 @@ class Notifier extends Component
     const ON_ERROR_FAIL = 0;
 	const ON_ERROR_IGNORE = 1;
 	const ON_ERROR_THROW = 2;
+	const ON_ERROR_STORE_ERRORS = 3;
 
     /**
      * Sends the given notifications through available channels to the given notifiable entities.
@@ -86,12 +87,12 @@ class Notifier extends Component
         if (!is_array($notifications)){
             $notifications = [$notifications];
         }
-        foreach ($recipients as $recipient) {
-            $channels = array_intersect($recipient->viaChannels(), array_keys($this->channels));
-            foreach ($notifications as $notification) {
+        foreach ($notifications as $notification) {
+            foreach ($recipients as $recipient) {
                 if (!$recipient->shouldReceiveNotification($notification)) {
                     continue;
                 }
+                $channels = array_intersect($recipient->viaChannels(), array_keys($this->channels));
                 $channels = array_intersect($channels, $notification->broadcastOn());
                 foreach ($channels as $channel) {
                     $channelInstance = $this->getChannelInstance($channel);
@@ -110,6 +111,8 @@ class Notifier extends Component
 							case self::ON_ERROR_IGNORE:
 								$notification->clearNotificationErrors();
 								break;
+							case self::ON_ERROR_STORE_ERRORS:
+                                break;
 						}
                     }
                     $this->trigger(self::EVENT_AFTER_SEND, new NotificationEvent([
