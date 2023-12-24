@@ -69,7 +69,8 @@ class MailChannel extends Component implements ChannelInterface
 			'recipient' => $recipient,
 			'from' => $message->from,
 			'notification' => $notification,
-			'message' => $message
+			'message' => $message,
+			'channel' => 'mail',
 		];
 		$to = (array)$recipient->routeNotificationFor('mail');
 		$subject = $message->subject;
