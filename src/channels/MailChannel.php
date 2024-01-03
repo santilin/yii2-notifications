@@ -28,6 +28,9 @@ class MailChannel extends Component implements ChannelInterface
      */
     public $senderAccounts = [];
 
+	/** @var string A prefix to prepend to all mail subject messages */
+	public $subjectPrefix = null;
+
     /**
      * @inheritdoc
      */
@@ -74,6 +77,9 @@ class MailChannel extends Component implements ChannelInterface
 		];
 		$to = (array)$recipient->routeNotificationFor('mail');
 		$subject = $message->subject;
+		if ($this->subjectPrefix) {
+			$subject = $this->subjectPrefix . $subject;
+		}
 		if( YII_ENV_DEV ) {
 			$subject = '[dev:to:' . reset($to). "]{$subject}";
 			$to = [Yii::$app->params['develEmail']??'example@example.org'];

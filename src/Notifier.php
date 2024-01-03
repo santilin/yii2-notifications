@@ -61,7 +61,6 @@ class Notifier extends Component
      */
     public $channels = [];
 
-
     /*
      * Error handling stategies
      */
