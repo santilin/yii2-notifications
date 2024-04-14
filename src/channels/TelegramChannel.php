@@ -81,7 +81,8 @@ class TelegramChannel extends Component implements ChannelInterface
         }
         $chatId = $recipient->routeNotificationFor('telegram');
         if(!$chatId){
-            throw new InvalidArgumentException( 'No chat ID provided');
+            $notification->addError('telegram_chat_id', 'No chat ID provided');
+            return null;
         }
 
         $data = [
