@@ -22,6 +22,9 @@ class MailChannel extends Component implements ChannelInterface
      */
     public $mailer = 'mailer';
 
+	/** @var string custom views path for the mailer component */
+	public $viewsPath = null; // '@Da/User/resources/views';
+
     /**
      * The message sender accounts.
      * @var string
@@ -84,12 +87,19 @@ class MailChannel extends Component implements ChannelInterface
 			$subject = '[dev:to:' . reset($to). "]{$subject}";
 			$to = [Yii::$app->params['develEmail']??'example@example.org'];
 		}
+		if ($this->viewsPath) {
+			$save_view_path = Yii::$app->mailer->getViewPath();
+			Yii::$app->mailer->setViewPath($this->viewsPath);
+		}
 		$composed = Yii::$app->mailer
 			->compose($message_views, $data)
 			->setFrom($message->from)
 			->setTo($to)
 			->setSubject($subject);
 		try {
+			if ($this->viewsPath) {
+				Yii::$app->mailer->setViewPath($save_view_path);
+			}
 			$sent = $composed->send();
 		} catch (\Swift_TransportException $e ) {
 			$mailer_error = $e->getMessage();
