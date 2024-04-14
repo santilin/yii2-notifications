@@ -38,7 +38,7 @@ trait NotifiableTrait
      */
     public function viaChannels()
     {
-        return ['mail','flash'];
+        return ['mail','flash','telegram'];
     }
 
     /**
@@ -59,6 +59,10 @@ trait NotifiableTrait
         switch ($channel) {
             case 'mail':
                 return $this->email;
+            case 'telegram':
+                if ($this->property_exists('telegram_chat_id')) {
+                    return $this->telegram_chat_id;
+                }
             case 'twilio':
                 return $this->phone_number;
             case 'database':
