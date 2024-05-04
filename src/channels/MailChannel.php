@@ -104,6 +104,8 @@ class MailChannel extends Component implements ChannelInterface
 				Yii::$app->mailer->setViewPath($save_view_path);
 			}
 			$sent = $composed->send();
+		} catch (\Symfony\Component\Mailer\Exception\TransportException $e) {
+			$mailer_error = $e->getMessage();
 		} catch (\Swift_TransportException $e ) {
 			$mailer_error = $e->getMessage();
 		} catch (\Swift_RfcComplianceException $e ) {
