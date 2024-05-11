@@ -55,7 +55,7 @@ class MailChannel extends Component implements ChannelInterface
 			$message_views = [ 'html' => $message_views, 'text' => $message_views ];
 		}
 		$sent = false;
-		$mailer_error = '';
+		$mailer_error = $mailer_error_debug = '';
 		Yii::$app->mailer->on(\yii\mail\BaseMailer::EVENT_AFTER_SEND,
 			function(\yii\mail\MailEvent $event) use ($mailer_error, $sent) {
 				$sent = $event->isSuccessful;
@@ -106,6 +106,9 @@ class MailChannel extends Component implements ChannelInterface
 			$sent = $composed->send();
 		} catch (\Symfony\Component\Mailer\Exception\TransportException $e) {
 			$mailer_error = $e->getMessage();
+			if (YII_ENV_DEV) {
+				$mailer_error_debug = $e->getDebug();
+			}
 		} catch (\Swift_TransportException $e ) {
 			$mailer_error = $e->getMessage();
 		} catch (\Swift_RfcComplianceException $e ) {
@@ -134,6 +137,9 @@ class MailChannel extends Component implements ChannelInterface
 				if( YII_ENV_DEV ) {
 					$notification->addError('transport', $e->getMessage());
 				}
+			}
+			if ($mailer_error_debug) {
+				$notification->addError('debug', $mailer_error_debug);
 			}
 			return false;
 		}
