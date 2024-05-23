@@ -104,15 +104,19 @@ class TelegramChannel extends Component implements ChannelInterface
             $data['parse_mode'] = $this->parseMode;
         }
 
-        $response_object = $this->httpClient->createRequest()
+        $response_request = $this->httpClient->createRequest()
             ->setUrl($this->createUrl())
-            ->setData($data)
-            ->send();
-        $response = json_decode($response_object->getContent());
-        if (!$response->ok) {
-            $notification->addError('request_error', $response->description);
+            ->setData($data);
+        if (!YII_ENV_TEST) {
+            $response_object = $response_request->send();
+            $response = json_decode($response_object->getContent());
+            if (!$response->ok) {
+                $notification->addError('request_error', $response->description);
+            }
+            return $response;
+        } else {
+            return true;
         }
-        return $response;
     }
 
     private function createUrl()
