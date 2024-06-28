@@ -10,11 +10,11 @@ use tuyakhov\notifications\NotificationInterface;
 
 class AdHocRecipient implements NotifiableInterface
 {
-	protected $channels;
+	protected $channels = [];
 
 	public function __construct(array $channels)
 	{
-		$this->channels = array_merge( ['flash'=>true], $channels);
+		$this->channels = array_merge($this->channels, $channels);
 	}
 
     public function shouldReceiveNotification(NotificationInterface $notification)

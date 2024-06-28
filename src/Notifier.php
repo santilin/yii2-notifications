@@ -108,7 +108,9 @@ class Notifier extends Component
 								}
 								break;
 							case self::ON_ERROR_IGNORE:
-								$notification->clearNotificationErrors();
+                                if (!YII_ENV_DEV) {
+                                    $notification->clearNotificationErrors();
+                                }
 								break;
 							case self::ON_ERROR_STORE_ERRORS:
                                 break;

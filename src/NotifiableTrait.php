@@ -33,12 +33,12 @@ trait NotifiableTrait
     }
 
     /**
-     * Send notifications via email by default
+     * Send notifications via email and flash by default
      * @return array
      */
     public function viaChannels()
     {
-        return ['mail','flash','telegram'];
+        return ['mail','flash'];
     }
 
     /**
