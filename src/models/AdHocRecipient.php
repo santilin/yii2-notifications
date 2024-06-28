@@ -14,7 +14,7 @@ class AdHocRecipient implements NotifiableInterface
 
 	public function __construct(array $channels)
 	{
-		$this->channels = array_merge($this->channels, $channels);
+		$this->channels = $channels;
 	}
 
     public function shouldReceiveNotification(NotificationInterface $notification)
