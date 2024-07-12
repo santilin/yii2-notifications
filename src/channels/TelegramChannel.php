@@ -39,6 +39,12 @@ class TelegramChannel extends Component implements ChannelInterface
     public $botToken;
 
     /**
+     * The botToken for devel environment
+     * @var string
+     */
+    public $develBotToken;
+
+    /**
      * @var string
      */
     public $parseMode = self::PARSE_MODE_MARKDOWN;
@@ -121,6 +127,10 @@ class TelegramChannel extends Component implements ChannelInterface
 
     private function createUrl()
     {
-        return "bot{$this->botToken}/sendMessage";
+        if (YII_ENV_DEV && isset($this->develBotToken)) {
+            return "bot{$this->develBotToken}/sendMessage";
+        } else {
+            return "bot{$this->botToken}/sendMessage";
+        }
     }
 }
