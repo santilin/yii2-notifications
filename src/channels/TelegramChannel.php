@@ -11,6 +11,7 @@ use tuyakhov\notifications\messages\TelegramMessage;
 use yii\base\Component;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
+use yii\httpclient\Exception as TelegramException;
 use yii\di\Instance;
 use yii\helpers\Json;
 use yii\httpclient\Client;
@@ -114,7 +115,15 @@ class TelegramChannel extends Component implements ChannelInterface
             ->setUrl($this->createUrl())
             ->setData($data);
         if (!YII_ENV_TEST) {
-            $response_object = $response_request->send();
+            try {
+                $response_object = $response_request->send();
+            } catch( TelegramException $e) {
+                if (YII_ENV_DEV) {
+                    \Yii::error('Telegram send: ' . $e->getMessage());
+                    $notification->addError('request_error', $e->getMessage());
+                    return true;
+                }
+            }
             $response = json_decode($response_object->getContent());
             if (!$response->ok) {
                 $notification->addError('request_error', $response->description);
