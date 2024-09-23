@@ -99,6 +99,11 @@ class TelegramChannelMock extends Component implements ChannelInterface
         return self::$_messages;
     }
 
+    static public function clearMessages()
+    {
+        self::$_messages = [];
+    }
+
     static public function getMessagesTo(string $chat_id): array
     {
         return array_filter(self::$_messages, function($item) use ($chat_id) {
