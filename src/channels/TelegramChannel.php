@@ -48,7 +48,7 @@ class TelegramChannel extends Component implements ChannelInterface
     /**
      * @var string
      */
-    public $parseMode = self::PARSE_MODE_MARKDOWN;
+    public $parseMode = self::PARSE_MODE_HTML;
 
     const PARSE_MODE_HTML = "HTML";
 
