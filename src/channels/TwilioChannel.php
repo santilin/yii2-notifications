@@ -89,7 +89,7 @@ class TwilioChannel extends Component implements ChannelInterface
     /**
      * @inheritdoc
      */
-    public function send(NotifiableInterface $recipient, NotificationInterface $notification)
+    public function send(NotifiableInterface $recipient, NotificationInterface $notification, string $sender_account = null)
     {
         /** @var SmsMessage $message */
         $message = $notification->exportFor('sms');

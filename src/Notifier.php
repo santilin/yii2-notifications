@@ -78,7 +78,7 @@ class Notifier extends Component
      * @return void
      * @throws InvalidConfigException
      */
-    public function send($recipients, $notifications)
+    public function send($recipients, $notifications, string $sender_account = null)
     {
         if (!is_array($recipients)) {
             $recipients = [$recipients];
@@ -96,8 +96,8 @@ class Notifier extends Component
                 foreach ($channels as $channel) {
                     $channelInstance = $this->getChannelInstance($channel);
 					\Yii::info("Sending notification " . get_class($notification) . " to " . get_class($recipient) . " via {$channel}", __METHOD__);
-					$response = $channelInstance->send($recipient, $notification);
-					if (!$response || $notification->hasNotificationErrors()) {
+					$response = $channelInstance->send($recipient, $notification, $sender_account);
+					if ($response !== true || $notification->hasNotificationErrors()) {
 						$response = implode("\n",$notification->notificationErrors());
                         \Yii::error("Error sending notification " . get_class($notification) . " to " . get_class($recipient) . " via {$channel}\n" . $response,  __METHOD__);
 						switch($notification->onError) {

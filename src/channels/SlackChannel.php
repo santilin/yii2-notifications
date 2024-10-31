@@ -41,7 +41,7 @@ class SlackChannel extends Component implements ChannelInterface
      * @param NotificationInterface $notification
      * @return Response
      */
-    public function send(NotifiableInterface $recipient, NotificationInterface $notification)
+    public function send(NotifiableInterface $recipient, NotificationInterface $notification, string $sender_account = null)
     {
         /** @var SlackMessage $message */
         $message = $notification->exportFor('slack');

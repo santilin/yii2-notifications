@@ -30,13 +30,20 @@ class TelegramChannelMock extends Component implements ChannelInterface
      * The token looks something like 123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
      * @var string
      */
-    public $botToken;
+    public string $botToken;
 
     /**
      * The botToken for devel environment
      * @var string
      */
-    public $develBotToken;
+    public string $develBotToken;
+
+    /**
+     * The accounts with members:
+     *  - string botToken
+     *  - string develBotToken
+     */
+    public array $senderAccounts = [];
 
     /**
      * @var string
@@ -63,7 +70,7 @@ class TelegramChannelMock extends Component implements ChannelInterface
     /**
      * @inheritDoc
      */
-    public function send(NotifiableInterface $recipient, NotificationInterface $notification)
+    public function send(NotifiableInterface $recipient, NotificationInterface $notification, string $sender_account = null)
     {
         /** @var TelegramMessage $message */
         $message = $notification->exportFor('telegram');
@@ -83,6 +90,7 @@ class TelegramChannelMock extends Component implements ChannelInterface
             'subject' => $message->subject,
             'body' => $message->body,
             'message' => $message,
+            'account' => $account
         ];
 
         if(isset($this->parseMode)){

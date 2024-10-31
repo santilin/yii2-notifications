@@ -21,7 +21,7 @@ class ActiveRecordChannel extends Component implements ChannelInterface
      */
     public $model = 'tuyakhov\notifications\models\Notification';
 
-    public function send(NotifiableInterface $recipient, NotificationInterface $notification)
+    public function send(NotifiableInterface $recipient, NotificationInterface $notification, string $sender_account = null)
     {
         $model = \Yii::createObject($this->model);
 
@@ -39,6 +39,7 @@ class ActiveRecordChannel extends Component implements ChannelInterface
             'notifiable_type' => $notifiableType,
             'notifiable_id' => $notifiableId,
             'data' => Json::encode($message->data),
+            'sender_account' => $sender_account
         ];
 
         if ($model->load($data, '')) {

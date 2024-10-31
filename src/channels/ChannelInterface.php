@@ -13,8 +13,9 @@ interface ChannelInterface
     /**
      * @param NotifiableInterface $recipient
      * @param NotificationInterface $notification
+     * @param string|null $sender_account
      * @return mixed channel response
      * @throws \Exception
      */
-    public function send(NotifiableInterface $recipient, NotificationInterface $notification);
+    public function send(NotifiableInterface $recipient, NotificationInterface $notification, string $sender_account = null);
 }

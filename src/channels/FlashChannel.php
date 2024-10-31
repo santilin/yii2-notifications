@@ -29,7 +29,7 @@ class FlashChannel extends Component implements ChannelInterface
         $this->session= Instance::ensure($this->session, 'yii\web\Session');
     }
 
-    public function send(NotifiableInterface $recipient, NotificationInterface $notification)
+    public function send(NotifiableInterface $recipient, NotificationInterface $notification, string $sender_account = null)
     {
         /**
          * @var $message MailMessage

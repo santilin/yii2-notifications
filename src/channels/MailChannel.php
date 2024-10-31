@@ -43,7 +43,7 @@ class MailChannel extends Component implements ChannelInterface
         $this->mailer = Instance::ensure($this->mailer, 'yii\mail\MailerInterface');
     }
 
-    public function send(NotifiableInterface $recipient, NotificationInterface $notification)
+    public function send(NotifiableInterface $recipient, NotificationInterface $notification, string $sender_account = null)
     {
         /**
          * @var $message MailMessage
@@ -64,8 +64,19 @@ class MailChannel extends Component implements ChannelInterface
 				}
 			}
 		);
+
+		if (isset($this->senderAccounts[$sender_account])) {
+			$sender_data = $this->senderAccounts[$sender_account];
+		} else if (!$sender_account || $sender_accout == 'admin') {
+			$sender_data = [
+				'from' => Yii::$app->params['adminEmail']??null,
+			];
+		} else {
+			throw new InvalidConfigException("No settings found for $sender_account mail sender account");
+		}
+
 		if (empty($message->from)) {
-			$message->from = $this->senderAccounts[$message->senderAccount]??null;
+			$message->from = $sender_data['from'];
 		}
 		if (empty($message->from)) {
             throw new InvalidConfigException('neither from nor senderAccount found in mail message');
