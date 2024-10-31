@@ -44,4 +44,23 @@ class TelegramMessage extends AbstractMessage
      * @var bool
      */
     public $withoutPagePreview = false;
+
+    /**
+     * @var string
+     */
+    public string $parseMode = self::PARSE_MODE_MARKDOWN;
+
+    const PARSE_MODE_HTML = "HTML";
+
+    const PARSE_MODE_MARKDOWN = "Markdown";
+
+    public function setMarkDownMode()
+    {
+        $this->parseMode = self::PARSE_MODE_MARKDOWN;
+    }
+
+    public function setHtmlMode()
+    {
+        $this->parseMode = self::PARSE_MODE_HTML;
+    }
 }
