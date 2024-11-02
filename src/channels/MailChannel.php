@@ -130,7 +130,7 @@ class MailChannel extends Component implements ChannelInterface
 		}
 		if( !$sent ) {
 			if( count($to) > 1 ) {
-				$error_message = Yii::t('churros', 'Unable to send email to {email} and other {ndest} recipients from {from}', ['email' => array_pop($to), 'ndest' => count($to)], 'from' => $from);
+				$error_message = Yii::t('churros', 'Unable to send email to {email} and other {ndest} recipients from {from}', ['email' => array_pop($to), 'ndest' => count($to), 'from' => $from]);
 			} else {
 				$error_message = Yii::t('churros', 'Unable to send email to {email} from {from}', ['email' => array_pop($to), 'from' => $from ]);
 			}

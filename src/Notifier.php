@@ -99,7 +99,7 @@ class Notifier extends Component
 					$response = $channelInstance->send($recipient, $notification, $sender_account);
 					if ($response !== true || $notification->hasNotificationErrors()) {
 						// $response = implode("\n",$notification->notificationErrors());
-                        \Yii::error("Error sending `$channel` notification " . get_class($notification) . " to " . get_class($recipient) . "\n" . $response,  __METHOD__);
+                        \Yii::error("Error sending `$channel` notification " . get_class($notification) . " to " . get_class($recipient) . "\n" . json_encode($response),  __METHOD__);
 						switch($notification->onError) {
 							case self::ON_ERROR_FAIL:
 							case self::ON_ERROR_THROW:
