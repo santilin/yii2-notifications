@@ -130,9 +130,9 @@ class MailChannel extends Component implements ChannelInterface
 		}
 		if( !$sent ) {
 			if( count($to) > 1 ) {
-				$error_message = Yii::t('churros', 'Unable to send email to {email} and other {ndest} recipients from {from}', ['email' => array_pop($to), 'ndest' => count($to), 'from' => $from]);
+				$error_message = Yii::t('churros', 'Unable to send email to {email} and other {ndest} recipients from {from}', ['email' => array_pop($to), 'ndest' => count($to), 'from' => $message->from]);
 			} else {
-				$error_message = Yii::t('churros', 'Unable to send email to {email} from {from}', ['email' => array_pop($to), 'from' => $from ]);
+				$error_message = Yii::t('churros', 'Unable to send email to {email} from {from}', ['email' => array_pop($to), 'from' => $message->from ]);
 			}
 			if (strpos($mailer_error, 'php_network_getaddresses: getaddrinfo failed') !== FALSE) {
 				$notification->addError('sendmail_network_error', $error_message);
