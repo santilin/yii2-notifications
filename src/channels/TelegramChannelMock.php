@@ -90,7 +90,7 @@ class TelegramChannelMock extends Component implements ChannelInterface
             'subject' => $message->subject,
             'body' => $message->body,
             'message' => $message,
-            'account' => $account
+            'account' => $sender_account
         ];
 
         if(isset($this->parseMode)){

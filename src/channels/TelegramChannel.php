@@ -147,18 +147,22 @@ class TelegramChannel extends Component implements ChannelInterface
         if (!YII_ENV_TEST) {
             try {
                 $response_object = $response_request->send();
-            } catch( TelegramException $e) {
+                $response = json_decode($response_object->getContent());
+            } catch (TelegramException $e) {
                 if (YII_ENV_DEV) {
                     \Yii::error('Telegram send: ' . $e->getMessage());
                     $notification->addError('request_error', $e->getMessage());
                     return true;
                 }
+                $response = [
+                    'ok' => false,
+                    'description' => "Error sending telegram message: " . $e->getMessage()
+                ];
             }
-            $response = json_decode($response_object->getContent());
             if (!$response->ok) {
-                $notification->addError('request_error', "Error sending message to Telegram chat via $sender_account account:\n{$response->description}");
+                $notification->addError('request_error', "Error sending message to Telegram chat via `$sender_account` account:\n{$response->description}");
                 if (YII_ENV_DEV) {
-                    $notification->addError('devel', $text);
+                    $notification->addError('devel', "\nMessage content:\n$text");
                 }
             }
             return $response;
