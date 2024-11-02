@@ -80,9 +80,10 @@ class TelegramChannel extends Component implements ChannelInterface
         /** @var TelegramMessage $message */
         $message = $notification->exportFor('telegram');
         if ($message->parseMode == TelegramMessage::PARSE_MODE_MARKDOWN) {
-            $text = $message->body;
             if (!empty($message->subject)) {
-                $text = "*{$message->subject}*\n$text";
+                $text = "*{$message->subject}*\n\n{$message->body}";
+            } else {
+                $text = $message->body;
             }
         } else {
             $text = $this->cleanHtml($message->body);
@@ -111,6 +112,7 @@ class TelegramChannel extends Component implements ChannelInterface
 
 
         if (YII_ENV_DEV) {
+            $data['chat_id'] = __DEVEL_TELEGRAM_CHAT_ID__;
             if ($sender_account != null) {
                 if (isset($this->senderAccounts[$sender_account])) {
                     if (isset($this->senderAccounts[$sender_account]['develBotToken'])) {
@@ -160,7 +162,8 @@ class TelegramChannel extends Component implements ChannelInterface
                 ];
             }
             if (!$response->ok) {
-                $notification->addError('request_error', "Error sending message to Telegram chat via `$sender_account` account:\n{$response->description}");
+                $via = ($sender_account ? " via $sender_account account" : '');
+                $notification->addError('request_error', "Error sending message to Telegram chat$via:\n{$response->description}");
                 if (YII_ENV_DEV) {
                     $notification->addError('devel', "\nMessage content:\n$text");
                 }
