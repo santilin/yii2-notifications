@@ -148,6 +148,8 @@ class MailChannel extends Component implements ChannelInterface
 				$notification->addError('sendmail', $error_message);
 				if( YII_ENV_DEV ) {
 					$notification->addError('transport', $e->getMessage());
+				} else {
+					Yii::error($error_message . "\n" . $e->getMessage())
 				}
 			}
 			if ($mailer_error_debug) {
