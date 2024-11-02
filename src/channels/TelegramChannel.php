@@ -81,13 +81,12 @@ class TelegramChannel extends Component implements ChannelInterface
         $message = $notification->exportFor('telegram');
         if ($message->parseMode == TelegramMessage::PARSE_MODE_MARKDOWN) {
             if (!empty($message->subject)) {
-                $text = "*{$message->subject}*\n\n{$message->body}";
-            } else {
-                $text = $message->body;
+                $text = "*" . self::cleanHtml($message->subject) . "*\n\n";
             }
         } else {
-            $text = $this->cleanHtml($message->body);
+            $text = '';
         }
+        $text .= self::cleanHtml($message->body);
         $chatId = $recipient->routeNotificationFor('telegram');
         if(!$chatId){
             $notification->addError('telegram_chat_id', 'No chat ID provided');
@@ -179,16 +178,15 @@ class TelegramChannel extends Component implements ChannelInterface
     {
         // Remove all HTML tags except for a few allowed ones
         $allowedTags = '<b><strong><i><em><u><ins><s><strike><del><a><code><pre><tg-spoiler><tg-emoji><blockquote>';
-        $text = strip_tags($html, $allowedTags);
+        $text = strip_tags(trim($html), $allowedTags);
+
+        // Remove extra whitespace but keep newlines
+        $text = preg_replace('/[^\S\r\n]+/', ' ', $text);
 
         // Convert <br> tags to newlines
         $text = preg_replace('/<br\s*\/?>/i', "\n", $text);
 
-        // Remove extra whitespace
-        $text = preg_replace('/\s+/', ' ', $text);
-
-        // Trim the text
-        $text = trim($text);
+        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
         return $text;
     }
