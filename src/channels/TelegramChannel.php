@@ -75,7 +75,7 @@ class TelegramChannel extends Component implements ChannelInterface
     /**
      * @inheritDoc
      */
-    public function send(NotifiableInterface $recipient, NotificationInterface $notification, string $sender_account = null)
+    public function send(NotifiableInterface $recipient, NotificationInterface $notification, string $sender_account = null, &$response): bool)
     {
         /** @var TelegramMessage $message */
         $message = $notification->exportFor('telegram');
@@ -166,11 +166,10 @@ class TelegramChannel extends Component implements ChannelInterface
                 if (YII_ENV_DEV) {
                     $notification->addError('devel', "\nMessage content:\n$text");
                 }
+                return false;
             }
-            return $response;
-        } else {
-            return true;
         }
+        return true;
     }
 
     // https://core.telegram.org/bots/api#html-style
@@ -185,6 +184,7 @@ class TelegramChannel extends Component implements ChannelInterface
 
         // Convert <br> tags to newlines
         $text = preg_replace('/<br\s*\/?>/i', "\n", $text);
+        $text = preg_replace('/[\r\n]+/', "\n\n", $text);
 
         $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 

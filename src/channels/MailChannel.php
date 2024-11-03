@@ -43,7 +43,7 @@ class MailChannel extends Component implements ChannelInterface
         $this->mailer = Instance::ensure($this->mailer, 'yii\mail\MailerInterface');
     }
 
-    public function send(NotifiableInterface $recipient, NotificationInterface $notification, string $sender_account = null)
+    public function send(NotifiableInterface $recipient, NotificationInterface $notification, string $sender_account = null, &$response): bool
     {
         /**
          * @var $message MailMessage
@@ -155,6 +155,7 @@ class MailChannel extends Component implements ChannelInterface
 			if ($mailer_error_debug) {
 				$notification->addError('debug', $mailer_error_debug);
 			}
+			$response = $error_message;
 			return false;
 		}
 		return true;
