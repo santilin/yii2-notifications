@@ -173,8 +173,11 @@ class TelegramChannel extends Component implements ChannelInterface
     }
 
     // https://core.telegram.org/bots/api#html-style
-    protected function cleanHtml(string $html): string
+    protected function cleanHtml(?string $html): string
     {
+        if (empty($html)) {
+            return '';
+        }
         // Remove all HTML tags except for a few allowed ones
         $allowedTags = '<b><strong><i><em><u><ins><s><strike><del><a><code><pre><tg-spoiler><tg-emoji><blockquote>';
         $text = strip_tags(trim($html), $allowedTags);
