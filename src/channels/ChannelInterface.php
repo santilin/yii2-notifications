@@ -17,5 +17,5 @@ interface ChannelInterface
      * @return mixed channel response
      * @throws \Exception
      */
-    public function send(NotifiableInterface $recipient, NotificationInterface $notification, string $sender_account = null);
+    public function send(NotifiableInterface $recipient, NotificationInterface $notification, string $sender_account = null, & $response): bool;
 }

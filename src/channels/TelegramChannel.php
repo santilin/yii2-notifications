@@ -184,7 +184,6 @@ class TelegramChannel extends Component implements ChannelInterface
 
         // Convert <br> tags to newlines
         $text = preg_replace('/<br\s*\/?>/i', "\n", $text);
-        $text = preg_replace('/[\r\n]+/', "\n\n", $text);
 
         $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
