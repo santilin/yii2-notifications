@@ -11,10 +11,7 @@ use tuyakhov\notifications\messages\TelegramMessage;
 use yii\base\Component;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
-use yii\httpclient\Exception as TelegramException;
-use yii\di\Instance;
 use yii\helpers\Json;
-use yii\httpclient\Client;
 
 /**
  * See an example flow of sending notifications in Telegram
@@ -74,10 +71,14 @@ class TelegramChannelMock extends Component implements ChannelInterface
     {
         /** @var TelegramMessage $message */
         $message = $notification->exportFor('telegram');
-        $text = $message->body;
-        if (!empty($message->subject)) {
-            $text = "*{$message->subject}*\n{$message->body}";
+        if ($message->parseMode == TelegramMessage::PARSE_MODE_MARKDOWN) {
+            if (!empty($message->subject)) {
+                $text = "*" . TelegramChannel::cleanHtml($message->subject) . "*\n\n";
+            }
+        } else {
+            $text = '';
         }
+        $text .= TelegramChannel::cleanHtml($message->body);
         $chatId = $recipient->routeNotificationFor('telegram');
         if(!$chatId){
             $notification->addError('telegram_chat_id', 'No chat ID provided');
@@ -87,14 +88,17 @@ class TelegramChannelMock extends Component implements ChannelInterface
         $data = [
             'chat_id' => $chatId,
             'text' => $text,
-            'subject' => $message->subject,
-            'body' => $message->body,
-            'message' => $message,
-            'account' => $sender_account
+            'disable_notification' => $message->silentMode,
+            'parse_mode' => $message->parseMode,
+            'disable_web_page_preview' => $message->withoutPagePreview,
         ];
 
-        if(isset($this->parseMode)){
-            $data['parse_mode'] = $this->parseMode;
+        if ($message->replyToMessageId) {
+            $data['reply_to_message_id'] = $message->replyToMessageId;
+        }
+
+        if ($message->replyMarkup) {
+            $data['reply_markup'] = Json::encode($message->replyMarkup);
         }
 
         self::$_messages[] = $data;

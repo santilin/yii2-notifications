@@ -111,6 +111,7 @@ class TelegramChannel extends Component implements ChannelInterface
 
 
         if (YII_ENV_DEV) {
+            $data['text'] = 'to:' . $recipient->recordDesc() . "\n\n" . $data['text'];
             $data['chat_id'] = __DEVEL_TELEGRAM_CHAT_ID__;
             if ($sender_account != null) {
                 if (isset($this->senderAccounts[$sender_account])) {
@@ -173,7 +174,7 @@ class TelegramChannel extends Component implements ChannelInterface
     }
 
     // https://core.telegram.org/bots/api#html-style
-    protected function cleanHtml(?string $html): string
+    static public function cleanHtml(?string $html): string
     {
         if (empty($html)) {
             return '';
