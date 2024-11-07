@@ -17,52 +17,9 @@ use yii\helpers\Json;
  * See an example flow of sending notifications in Telegram
  * @see https://core.telegram.org/bots#deep-linking-example
  */
-class TelegramChannelMock extends Component implements ChannelInterface
+class TelegramChannelMock extends TelegramChannel
 {
-
     static private $_messages = [];
-
-    /**
-     * Each bot is given a unique authentication token when it is created.
-     * The token looks something like 123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
-     * @var string
-     */
-    public string $botToken;
-
-    /**
-     * The botToken for devel environment
-     * @var string
-     */
-    public string $develBotToken;
-
-    /**
-     * The accounts with members:
-     *  - string botToken
-     *  - string develBotToken
-     */
-    public array $senderAccounts = [];
-
-    /**
-     * @var string
-     */
-    public $parseMode = self::PARSE_MODE_MARKDOWN;
-
-    const PARSE_MODE_HTML = "HTML";
-
-    const PARSE_MODE_MARKDOWN = "Markdown";
-
-    /**
-     * @throws \yii\base\InvalidConfigException
-     */
-    public function init()
-    {
-        parent::init();
-
-        if(!isset($this->botToken)){
-            throw new InvalidConfigException('Bot token is undefined');
-        }
-
-    }
 
     /**
      * @inheritDoc
@@ -78,7 +35,8 @@ class TelegramChannelMock extends Component implements ChannelInterface
         } else {
             $text = '';
         }
-        $text .= TelegramChannel::cleanHtml($message->body);
+        $body = \Yii::$app->controller->renderPartial($message->view,
+            array_merge(['recipient' => $recipient, 'notification' => $notification], $message->viewData));
         $chatId = $recipient->routeNotificationFor('telegram');
         if(!$chatId){
             $notification->addError('telegram_chat_id', 'No chat ID provided');

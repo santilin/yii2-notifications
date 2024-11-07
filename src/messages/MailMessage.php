@@ -26,10 +26,4 @@ class MailMessage extends AbstractMessage
      */
     public $from;
 
-    /**
-     * The message sender account.
-     * @var string
-     */
-    public $senderAccount;
-
 }

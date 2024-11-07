@@ -26,4 +26,10 @@ abstract class AbstractMessage extends BaseObject
      * @var string
      */
     public $body;
+
+    /**
+     * The message sender account.
+     * @var string
+     */
+    public $senderAccount;
 }

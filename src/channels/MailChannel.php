@@ -90,6 +90,15 @@ class MailChannel extends Component implements ChannelInterface
 			'channel' => 'mail',
 		];
 		$to = (array)$recipient->routeNotificationFor('mail');
+		if (empty($to)) {
+			if (in_array('ModelInfoTrait', class_uses('Agente'))) {
+				throw new \Exception("Notification recipient `" . $recipient->recordDesc() . "`s `to` is empty");
+			} else if (is_a($recipient, BaseActiveRecord)) {
+				throw new \Exception("Notification recipient `" . $recipient->recordDesc() . "`s `to` is empty");
+			} else {
+				throw new \Exception("Notification recipient's `to` is empty");
+			}
+		}
 		$subject = $message->subject;
 		if ($this->subjectPrefix) {
 			$subject = $this->subjectPrefix . $subject;

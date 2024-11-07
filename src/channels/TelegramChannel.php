@@ -86,7 +86,9 @@ class TelegramChannel extends Component implements ChannelInterface
         } else {
             $text = '';
         }
-        $text .= self::cleanHtml($message->body);
+        $body = \Yii::$app->controller->renderPartial($message->view,
+            array_merge(['recipient' => $recipient, 'notification' => $notification], $message->viewData));
+        $text .= self::cleanHtml($body);
         $chatId = $recipient->routeNotificationFor('telegram');
         if(!$chatId){
             $notification->addError('telegram_chat_id', 'No chat ID provided');
