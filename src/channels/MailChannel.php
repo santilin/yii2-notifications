@@ -7,11 +7,10 @@
 namespace tuyakhov\notifications\channels;
 
 use Yii;
+use yii\db\BaseActiveRecord;
 use tuyakhov\notifications\messages\MailMessage;
-use tuyakhov\notifications\NotifiableInterface;
-use tuyakhov\notifications\NotificationInterface;
-use yii\base\Component;
-use yii\base\InvalidConfigException;
+use tuyakhov\notifications\{NotifiableInterface,NotificationInterface};
+use yii\base\{Component,InvalidConfigException};
 use yii\di\Instance;
 use yii\mail\MailerInterface;
 
@@ -91,9 +90,9 @@ class MailChannel extends Component implements ChannelInterface
 		];
 		$to = (array)$recipient->routeNotificationFor('mail');
 		if (empty($to)) {
-			if (in_array('ModelInfoTrait', class_uses('Agente'))) {
+			if (in_array('ModelInfoTrait', class_uses($recipient))) {
 				throw new \Exception("Notification recipient `" . $recipient->recordDesc() . "`s `to` is empty");
-			} else if (is_a($recipient, BaseActiveRecord)) {
+			} else if (is_a($recipient, 'yii\db\BaseActiveRecord')) {
 				throw new \Exception("Notification recipient `" . $recipient->recordDesc() . "`s `to` is empty");
 			} else {
 				throw new \Exception("Notification recipient's `to` is empty");

@@ -5,6 +5,7 @@
 
 namespace tuyakhov\notifications\channels;
 
+use Yii;
 use tuyakhov\notifications\NotifiableInterface;
 use tuyakhov\notifications\NotificationInterface;
 use tuyakhov\notifications\messages\TelegramMessage;
@@ -15,12 +16,14 @@ use yii\httpclient\Exception as TelegramException;
 use yii\di\Instance;
 use yii\helpers\Json;
 use yii\httpclient\Client;
+use yii\base\ViewContextInterface;
+use yii\web\View;
 
 /**
  * See an example flow of sending notifications in Telegram
  * @see https://core.telegram.org/bots#deep-linking-example
  */
-class TelegramChannel extends Component implements ChannelInterface
+class TelegramChannel extends Component implements ChannelInterface, ViewContextInterface
 {
     /**
      * @var Client|array|string
@@ -51,6 +54,15 @@ class TelegramChannel extends Component implements ChannelInterface
      *  - string develBotToken
      */
     public array $senderAccounts = [];
+
+    /**
+     * @var \yii\base\View|array view instance or its array configuration.
+     */
+    private $_view = [];
+    /**
+     * @var string the directory containing view files for composing mail messages.
+     */
+    private $_viewPath;
 
     /**
      * @throws \yii\base\InvalidConfigException
@@ -86,7 +98,7 @@ class TelegramChannel extends Component implements ChannelInterface
         } else {
             $text = '';
         }
-        $body = \Yii::$app->controller->renderPartial($message->view,
+        $body = $this->render($message->view,
             array_merge(['recipient' => $recipient, 'notification' => $notification], $message->viewData));
         $text .= self::cleanHtml($body);
         $chatId = $recipient->routeNotificationFor('telegram');
@@ -97,6 +109,7 @@ class TelegramChannel extends Component implements ChannelInterface
 
         $data = [
             'chat_id' => $chatId,
+            'subject' => $message->subject,
             'text' => $text,
             'disable_notification' => $message->silentMode,
             'parse_mode' => $message->parseMode,
@@ -194,5 +207,74 @@ class TelegramChannel extends Component implements ChannelInterface
         $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
         return $text;
+    }
+
+
+    /**
+     * @return View view instance.
+     */
+    public function getView()
+    {
+        if (!is_object($this->_view)) {
+            $this->_view = $this->createView($this->_view);
+        }
+
+        return $this->_view;
+    }
+
+    /**
+     * Creates view instance from given configuration.
+     * @param array $config view configuration.
+     * @return View view instance.
+     */
+    protected function createView(array $config)
+    {
+        if (!array_key_exists('class', $config)) {
+            $config['class'] = View::className();
+        }
+
+        return Yii::createObject($config);
+    }
+
+
+    /**
+     * Renders the specified view with optional parameters and layout.
+     * The view will be rendered using the [[view]] component.
+     * @param string $view the view name or the [path alias](guide:concept-aliases) of the view file.
+     * @param array $params the parameters (name-value pairs) that will be extracted and made available in the view file.
+     * @param string|bool $layout layout view name or [path alias](guide:concept-aliases). If false, no layout will be applied.
+     * @return string the rendering result.
+     */
+    public function render($view, $params = [], $layout = false)
+    {
+        $output = $this->getView()->render($view, $params, $this);
+        if ($layout !== false) {
+            return $this->getView()->render($layout, ['content' => $output, 'message' => $this->_message], $this);
+        }
+
+        return $output;
+    }
+
+    /**
+     * @param string $path the directory that contains the view files for composing mail messages
+     * This can be specified as an absolute path or a [path alias](guide:concept-aliases).
+     */
+    public function setViewPath($path)
+    {
+        $this->_viewPath = Yii::getAlias($path);
+    }
+
+
+    /**
+     * @return string the directory that contains the view files for composing mail messages
+     * Defaults to '@app/mail'.
+     */
+    public function getViewPath()
+    {
+        if ($this->_viewPath === null) {
+            $this->setViewPath('@app/views/mds');
+        }
+
+        return $this->_viewPath;
     }
 }

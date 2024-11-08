@@ -35,7 +35,7 @@ class TelegramChannelMock extends TelegramChannel
         } else {
             $text = '';
         }
-        $body = \Yii::$app->controller->renderPartial($message->view,
+        $body = $this->render($message->view,
             array_merge(['recipient' => $recipient, 'notification' => $notification], $message->viewData));
         $chatId = $recipient->routeNotificationFor('telegram');
         if(!$chatId){
@@ -45,6 +45,7 @@ class TelegramChannelMock extends TelegramChannel
 
         $data = [
             'chat_id' => $chatId,
+            'subject' => $message->subject,
             'text' => $text,
             'disable_notification' => $message->silentMode,
             'parse_mode' => $message->parseMode,
