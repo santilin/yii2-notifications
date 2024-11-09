@@ -166,21 +166,18 @@ class TelegramChannel extends Component implements ChannelInterface, ViewContext
                 $response_object = $response_request->send();
                 $response = json_decode($response_object->getContent());
             } catch (TelegramException $e) {
-                if (YII_ENV_DEV) {
-                    \Yii::error('Telegram send: ' . $e->getMessage());
-                    $notification->addError('request_error', $e->getMessage());
-                    return true;
-                }
-                $response = [
+                $response = (object)[
                     'ok' => false,
-                    'description' => "Error sending telegram message: " . $e->getMessage()
+                    'description' => $e->getMessage()
                 ];
             }
             if (!$response->ok) {
                 $via = ($sender_account ? " via $sender_account account" : '');
-                $notification->addError('request_error', "Error sending message to Telegram chat$via:\n{$response->description}");
+                $err_message = "Error sending message to Telegram chat$via:\n{$response->description}";
+                $notification->addError('request_error', $err_message);
+                Yii::error($err_message);
                 if (YII_ENV_DEV) {
-                    $notification->addError('devel', "\nMessage content:\n$text");
+                    Yii::error("Message content:\n$text");
                 }
                 return false;
             }
