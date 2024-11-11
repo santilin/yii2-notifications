@@ -19,17 +19,17 @@ abstract class AbstractMessage extends BaseObject
      * The subject of the notification.
      * @var string
      */
-    public $subject;
+    public ?string $subject = null;
 
     /**
      * The notification's message body
      * @var string
      */
-    public $body;
+    public ?string $body = null;
 
     /**
      * The message sender account.
      * @var string
      */
-    public $senderAccount;
+    public ?string $senderAccount = null;
 }

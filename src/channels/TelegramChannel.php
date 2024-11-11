@@ -89,6 +89,11 @@ class TelegramChannel extends Component implements ChannelInterface, ViewContext
      */
     public function send(NotifiableInterface $recipient, NotificationInterface $notification, string $sender_account = null, &$response): bool
     {
+        $chatId = $recipient->routeNotificationFor('telegram');
+        if(!$chatId){
+            $notification->addError('telegram_chat_id', 'No chat ID provided');
+            return null;
+        }
         /** @var TelegramMessage $message */
         $message = $notification->exportFor('telegram');
         if ($message->parseMode == TelegramMessage::PARSE_MODE_MARKDOWN) {
@@ -98,14 +103,11 @@ class TelegramChannel extends Component implements ChannelInterface, ViewContext
         } else {
             $text = '';
         }
-        $body = $this->render($message->view,
-            array_merge(['recipient' => $recipient, 'notification' => $notification], $message->viewData));
-        $text .= self::cleanHtml($body);
-        $chatId = $recipient->routeNotificationFor('telegram');
-        if(!$chatId){
-            $notification->addError('telegram_chat_id', 'No chat ID provided');
-            return null;
+        if ($message->body === null && $message->view) {
+            $message->body = $this->render($message->view,
+                array_merge(['recipient' => $recipient, 'notification' => $notification], $message->viewData));
         }
+        $text .= self::cleanHtml($message->body);
 
         $data = [
             'chat_id' => $chatId,
@@ -126,7 +128,11 @@ class TelegramChannel extends Component implements ChannelInterface, ViewContext
 
 
         if (YII_ENV_DEV) {
-            $data['text'] = 'to:' . $recipient->recordDesc() . "\n\n" . $data['text'];
+            if ($recipient instanceof BaseActiveRecord) {
+                $data['text'] = 'to:' . $recipient->recordDesc() . "\n\n" . $data['text'];
+            } else {
+                $data['text'] = 'to:' . get_class($recipient) . "\n\n" . $data['text'];
+            }
             $data['chat_id'] = __DEVEL_TELEGRAM_CHAT_ID__;
             if ($sender_account != null) {
                 if (isset($this->senderAccounts[$sender_account])) {
