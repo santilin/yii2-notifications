@@ -104,8 +104,12 @@ class TelegramChannel extends Component implements ChannelInterface, ViewContext
             $text = '';
         }
         if ($message->body === null && $message->view) {
-            $message->body = $this->render($message->view,
+            try {
+                $message->body = \Yii::$app->controller->renderPartial($message->view,
                 array_merge(['recipient' => $recipient, 'notification' => $notification], $message->viewData));
+            } catch (\yii\base\ViewNotFoundException $e) {
+                $message->body = '';
+            }
         }
         $text .= self::cleanHtml($message->body);
 

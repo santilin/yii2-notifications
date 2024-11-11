@@ -26,22 +26,29 @@ class TelegramChannelMock extends TelegramChannel
      */
     public function send(NotifiableInterface $recipient, NotificationInterface $notification, string $sender_account = null, &$response): bool
     {
-        /** @var TelegramMessage $message */
-        $message = $notification->exportFor('telegram');
-        if ($message->parseMode == TelegramMessage::PARSE_MODE_MARKDOWN) {
-            if (!empty($message->subject)) {
-                $text = "*" . TelegramChannel::cleanHtml($message->subject) . "*\n\n";
-            }
-        } else {
-            $text = '';
-        }
-        $body = $this->render($message->view,
-            array_merge(['recipient' => $recipient, 'notification' => $notification], $message->viewData));
         $chatId = $recipient->routeNotificationFor('telegram');
         if(!$chatId){
             $notification->addError('telegram_chat_id', 'No chat ID provided');
             return null;
         }
+        /** @var TelegramMessage $message */
+        $message = $notification->exportFor('telegram');
+        if ($message->parseMode == TelegramMessage::PARSE_MODE_MARKDOWN) {
+            if (!empty($message->subject)) {
+                $text = "*" . self::cleanHtml($message->subject) . "*\n\n";
+            }
+        } else {
+            $text = '';
+        }
+        if ($message->body === null && $message->view) {
+            try {
+                $message->body = \Yii::$app->controller->renderPartial($message->view,
+                    array_merge(['recipient' => $recipient, 'notification' => $notification], $message->viewData));
+            } catch (\yii\base\ViewNotFoundException $e) {
+                $message->body = '';
+            }
+        }
+        $text .= self::cleanHtml($message->body);
 
         $data = [
             'chat_id' => $chatId,
