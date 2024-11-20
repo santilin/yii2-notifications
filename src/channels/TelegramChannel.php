@@ -185,11 +185,11 @@ class TelegramChannel extends Component implements ChannelInterface, ViewContext
             if (!$response->ok) {
                 $via = ($sender_account ? " via $sender_account account" : '');
                 $err_message = "Error sending message to Telegram chat$via:\n{$response->description}";
+                if (YII_ENV_DEV) {
+                    $err_message .= "\nMessage content:\n$text";
+                }
                 $notification->addError('request_error', $err_message);
                 Yii::error($err_message);
-                if (YII_ENV_DEV) {
-                    Yii::error("Message content:\n$text");
-                }
                 return false;
             }
         }
