@@ -90,9 +90,14 @@ class TelegramChannel extends Component implements ChannelInterface, ViewContext
      */
     public function send(NotifiableInterface $recipient, NotificationInterface $notification, string $sender_account = null, &$response): bool
     {
+        if ($recipient instanceof BaseActiveRecord) {
+            $recipient_desc = $recipient->recordDesc();
+        } else {
+            $recipient_desc = get_class($recipient);
+        }
         $chatId = $recipient->routeNotificationFor('telegram');
         if(!$chatId){
-            $notification->addError('telegram_chat_id', 'No chat ID provided');
+            $notification->addError('telegram_chat_id', "No chat ID provided for $recipient_desc");
             return null;
         }
         /** @var TelegramMessage $message */
@@ -133,12 +138,8 @@ class TelegramChannel extends Component implements ChannelInterface, ViewContext
 
 
         if (YII_ENV_DEV) {
-            if ($recipient instanceof BaseActiveRecord) {
-                $data['text'] = 'to:' . $recipient->recordDesc() . "\n\n" . $data['text'];
-            } else {
-                $data['text'] = 'to:' . get_class($recipient) . "\n\n" . $data['text'];
-            }
             $data['chat_id'] = __DEVEL_TELEGRAM_CHAT_ID__;
+            $data['text'] = "to: $recipient_desc\n\n" . $data['text'];
             if ($sender_account != null) {
                 if (isset($this->senderAccounts[$sender_account])) {
                     if (isset($this->senderAccounts[$sender_account]['develBotToken'])) {
