@@ -128,6 +128,10 @@ class TelegramChannel extends Component implements ChannelInterface, ViewContext
             'disable_web_page_preview' => $message->withoutPagePreview,
         ];
 
+        if (!empty($message->linkPreviewOptions)) {
+            $data['linkPreviewOptions'] = $message->linkPreviewOptions;
+        }
+
         if ($message->replyToMessageId) {
             $data['reply_to_message_id'] = $message->replyToMessageId;
         }

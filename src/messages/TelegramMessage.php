@@ -57,6 +57,8 @@ class TelegramMessage extends AbstractMessage
      */
     public $withoutPagePreview = false;
 
+    public $linkPreviewOptions = [];
+
     /**
      * @var string
      */
