@@ -66,7 +66,9 @@ class MailChannel extends Component implements ChannelInterface
 				}
 			}
 		);
-
+		if (!$sender_account) {
+			$sender_account = $message->sender_account;
+		}
 		if (isset($this->senderAccounts[$sender_account])) {
 			$sender_data = $this->senderAccounts[$sender_account];
 		} else if (!$sender_account || $sender_accout == 'admin') {
@@ -105,6 +107,9 @@ class MailChannel extends Component implements ChannelInterface
 		if ($this->subjectPrefix) {
 			$subject = $this->subjectPrefix . $subject;
 		}
+		foreach ((array)$sender_data['addTo']??[] as $add_to) {
+			$to[] = $add_to;
+		}
 		if( YII_ENV_DEV ) {
 			// if (!isset(Yii::$app->params['develEmailFrom']) && !isset(Yii::$app->params['develEmailTo'])) {
 			// 	throw new \Exception("Please, define \$app->params['develEmailTo'] && \$app->params['develEmailFrom']");
@@ -123,6 +128,9 @@ class MailChannel extends Component implements ChannelInterface
 			->setFrom($message->from)
 			->setTo($to)
 			->setSubject($subject);
+		if (isset($sender_data['replyTo'])) {
+			$composed->setReplyTo($sender_data['replyTo']);
+		}
 		try {
 			if ($this->viewsPath) {
 				Yii::$app->mailer->setViewPath($save_view_path);
@@ -140,8 +148,8 @@ class MailChannel extends Component implements ChannelInterface
 		} catch (\Exception $e) {
 			throw $e;
 		}
-		if( !$sent ) {
-			if( count($to) > 1 ) {
+		if (!$sent) {
+			if (count($to) > 1) {
 				$error_message = Yii::t('churros', 'Unable to send email to {email} and other {ndest} recipients from {from}', ['email' => array_pop($to), 'ndest' => count($to), 'from' => $message->from]);
 			} else {
 				$error_message = Yii::t('churros', 'Unable to send email to {email} from {from}', ['email' => array_pop($to), 'from' => $message->from ]);
