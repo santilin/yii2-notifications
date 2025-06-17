@@ -67,11 +67,16 @@ class MailChannel extends Component implements ChannelInterface
 			}
 		);
 		if (!$sender_account) {
-			$sender_account = $message->sender_account;
+			$sender_account = $message->sender_account??'admin';
 		}
 		if (isset($this->senderAccounts[$sender_account])) {
 			$sender_data = $this->senderAccounts[$sender_account];
-		} else if (!$sender_account || $sender_accout == 'admin') {
+			if (is_string($sender_data)) {
+				$sender_data = [
+					'from' => $sender_data,
+				];
+			}
+		} else if (!$sender_account || $sender_account == 'admin') {
 			$sender_data = [
 				'from' => Yii::$app->params['adminEmail']??null,
 			];
@@ -107,7 +112,7 @@ class MailChannel extends Component implements ChannelInterface
 		if ($this->subjectPrefix) {
 			$subject = $this->subjectPrefix . $subject;
 		}
-		foreach ((array)$sender_data['addTo']??[] as $add_to) {
+		foreach ((array)($sender_data['addTo']??[]) as $add_to) {
 			$to[] = $add_to;
 		}
 		if( YII_ENV_DEV ) {
