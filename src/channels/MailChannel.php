@@ -67,7 +67,7 @@ class MailChannel extends Component implements ChannelInterface
 			}
 		);
 		if (!$sender_account) {
-			$sender_account = $message->sender_account??'admin';
+			$sender_account = $message->senderAccount??'admin';
 		}
 		if (isset($this->senderAccounts[$sender_account])) {
 			$sender_data = $this->senderAccounts[$sender_account];
