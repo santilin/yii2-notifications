@@ -116,12 +116,9 @@ class MailChannel extends Component implements ChannelInterface
 			$to[] = $add_to;
 		}
 		if( YII_ENV_DEV ) {
-			// if (!isset(Yii::$app->params['develEmailFrom']) && !isset(Yii::$app->params['develEmailTo'])) {
-			// 	throw new \Exception("Please, define \$app->params['develEmailTo'] && \$app->params['develEmailFrom']");
-			// }
 			$subject = '[dev:to:' . reset($to). "]{$subject}";
 			// $message->from = Yii::$app->params['develEmailFrom'];
-			$to = (array)Yii::$app->params['develEmailTo'];
+			$to = (array)(Yii::$app->params['develEmailTo']??Yii::$app->params['develEmail']);
 			$message->from = Yii::$app->params['develEmailFrom']??Yii::$app->params['develEmail'];
 		}
 		if ($this->viewsPath) {
