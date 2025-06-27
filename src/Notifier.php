@@ -4,6 +4,7 @@
  */
 
 namespace tuyakhov\notifications;
+use tuyakhov\notifications\channels\ChannelInterface;
 use tuyakhov\notifications\NotificationException;
 use tuyakhov\notifications\models\OneRecipient;
 use tuyakhov\notifications\events\NotificationEvent;
