@@ -118,6 +118,7 @@ class TelegramChannel extends Component implements ChannelInterface, ViewContext
             }
         }
         $text .= self::cleanHtml($message->body);
+        $text = self::truncateTelegramText($text);
 
         $data = [
             'chat_id' => $chatId,
@@ -289,5 +290,24 @@ class TelegramChannel extends Component implements ChannelInterface, ViewContext
         }
 
         return $this->_viewPath;
+    }
+
+    public static function truncateTelegramText(string $text): string
+    {
+        $max_len = 4096;
+        if (mb_strlen($text) <= $max_len) {
+            return $text;
+        }
+        $text = mb_substr($text, 0, $max_len);
+        if (mb_substr_count($text, '`') % 2 === 1) {
+            $text .= '`';
+        }
+        if (mb_substr_count($text, '*') % 2 === 1) {
+            $text .= '*';
+        }
+        if (mb_substr_count($text, '_') % 2 === 1) {
+            $text .= '_';
+        }
+        return $text;
     }
 }
